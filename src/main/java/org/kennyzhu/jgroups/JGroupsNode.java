@@ -116,7 +116,7 @@ public class JGroupsNode implements Receiver {
         try {
             LOGGER.info("******Get Msg :{}", msg);
             this.msg = msg;
-            MethodCall call = new MethodCall(GET_STATUS, msg);
+            MethodCall call = new MethodCall("getMsg", new Object[]{msg}, new Class[]{JGroupsNode.class});
             dispatcher.callRemoteMethods(null, call, CALL_OPTIONS);
         } catch (Exception e) {
             e.printStackTrace();
