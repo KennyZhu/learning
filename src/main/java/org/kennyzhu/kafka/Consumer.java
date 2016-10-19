@@ -18,7 +18,8 @@ public class Consumer {
         while (true) {
             ConsumerRecords<String, String> records = consumer.poll(100);
             for (ConsumerRecord<String, String> record : records)
-                System.out.printf("offset = %d, key = %s,value = %s", record.offset(), record.key(), record.value());
+                System.out.printf(";offset=%d, key=%s,value=%s", record.offset(), record.key(), record.value());
+            System.out.println();
         }
     }
 }
