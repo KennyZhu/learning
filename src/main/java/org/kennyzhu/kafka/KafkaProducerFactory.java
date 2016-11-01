@@ -65,15 +65,15 @@ public class KafkaProducerFactory {
     /**
      * kafka会根据zone来对消息进行分区。一个分区内的消息是可以保证顺序的
      */
-    public void sendMsg(String topic, String msg, String zone) {
-        if (StringUtils.isBlank(zone)) {
-            zone = msg;
+    public void sendMsg(String topic, String msg, String key) {
+        if (StringUtils.isBlank(key)) {
+            key = msg;
         }
         if (StringUtils.isBlank(topic)) {
             topic = DEFAULT_TOPIC;
         }
         if (StringUtils.isNotBlank(msg)) {
-            ProducerRecord<String, String> data = new ProducerRecord<>(topic, zone, msg);
+            ProducerRecord<String, String> data = new ProducerRecord<>(topic, key, msg);
             producer.send(data);
         }
     }
