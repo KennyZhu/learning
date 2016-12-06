@@ -5,6 +5,10 @@ package org.kennyzhu.arithmetic.leetCode;
  */
 public class ReverseInteger {
 
+    /**
+     * @param x
+     * @return
+     */
     public static int reverse2(int x) {
         int result = 0;
         while (x != 0) {
@@ -20,6 +24,10 @@ public class ReverseInteger {
         return result;
     }
 
+    /**
+     * @param x
+     * @return
+     */
     public static int reverse(int x) {
         if (x == 0) {
             return 0;

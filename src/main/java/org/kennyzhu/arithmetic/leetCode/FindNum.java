@@ -10,6 +10,11 @@ import java.util.Map;
  */
 public class FindNum {
 
+    /**
+     * 找到缺失的数据
+     * @param input
+     * @return
+     */
     public static List find(int[] input) {
         if (input == null || input.length == 0) {
             return null;

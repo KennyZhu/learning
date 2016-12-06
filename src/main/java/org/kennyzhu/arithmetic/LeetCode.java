@@ -1,14 +1,13 @@
 package org.kennyzhu.arithmetic;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-
 /**
  * Created by yanlongzhu on 2016/11/7.
  */
 public class LeetCode {
+    /**
+     * @param s
+     * @return
+     */
     public static String frequencySort(String s) {
         if (s == null || s.isEmpty())
             return s;
@@ -43,29 +42,31 @@ public class LeetCode {
         return builder.toString();
     }
 
-    public static void main(String[] args) {
-        try {
-            File file = new File("/Users/mfhj-dz-001-506/Documents/text");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-            String cc = null;
-            String input = "baa";
-//            while ((cc = reader.readLine()) != null) {
-//                input = input + cc;
-//            }
-            long beginTime = System.currentTimeMillis();
-            String outPut = frequencySort(input);
-            System.out.print("Cost is :" + (System.currentTimeMillis() - beginTime) + " output is " + outPut);
-            int[] ar = new int[100];
-            System.out.println(ar["a".charAt(0)]);
+    /**
+     public static void main(String[] args) {
+     try {
+     File file = new File("/Users/mfhj-dz-001-506/Documents/text");
+     BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+     String cc = null;
+     String input = "baa";
+     //            while ((cc = reader.readLine()) != null) {
+     //                input = input + cc;
+     //            }
+     long beginTime = System.currentTimeMillis();
+     String outPut = frequencySort(input);
+     System.out.print("Cost is :" + (System.currentTimeMillis() - beginTime) + " output is " + outPut);
+     int[] ar = new int[100];
+     System.out.println(ar["a".charAt(0)]);
 
-            char c1 = '*';
-            char c2 = '1';
-            System.out.println(c1 - c2);
+     char c1 = '*';
+     char c2 = '1';
+     System.out.println(c1 - c2);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+     } catch (Exception e) {
+     e.printStackTrace();
+     }
 
-    }
+     }
+     **/
 
 }
