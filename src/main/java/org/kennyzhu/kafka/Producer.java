@@ -12,18 +12,16 @@ public class Producer {
 
     public static void main(String[] args) {
 //        KafkaProducer producer = KafkaProducerFactory.getInstance().getProducer();
-        int i = 0;
-        while (true) {
+        for (int i = 0; i < 1000000; i++) {
+            for (int j = 0; j < 1000000; j++, i++) {
+                KafkaProducerFactory.getInstance().sendMsg(null, "###########msg------" + i + "==" + j);
+                try {
+                    Thread.sleep(100);
+                } catch (Exception e) {
 
-            LOGGER.info("#Begin to while i:" + i);
-            for (int j = 0; j < 10000; j++, i++) {
-                KafkaProducerFactory.getInstance().sendMsg(null, "msg------" + i);
-            }
-            try {
-                Thread.sleep(10000);
-            } catch (Exception e) {
-                e.printStackTrace();
+                }
             }
         }
+
     }
 }

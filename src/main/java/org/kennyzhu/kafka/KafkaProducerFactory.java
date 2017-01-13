@@ -3,11 +3,13 @@ package org.kennyzhu.kafka;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.util.Properties;
+import java.util.concurrent.Future;
 
 /**
  * Desc:
@@ -74,7 +76,13 @@ public class KafkaProducerFactory {
         }
         if (StringUtils.isNotBlank(msg)) {
             ProducerRecord<String, String> data = new ProducerRecord<>(topic, key, msg);
-            producer.send(data);
+            Future<RecordMetadata> future = producer.send(data);
+            try {
+                RecordMetadata recordMetadata = future.get();
+                LOGGER.info(recordMetadata.toString());
+            } catch (Exception e) {
+
+            }
         }
     }
 
