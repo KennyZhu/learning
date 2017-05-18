@@ -2,8 +2,10 @@ package org.kennyzhu.netflix.hystrix;
 
 import com.netflix.hystrix.HystrixCommand;
 import com.netflix.hystrix.HystrixCommandGroupKey;
+import com.netflix.hystrix.HystrixObservableCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rx.Observable;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -35,6 +37,18 @@ public class HystrixTest extends HystrixCommand<String> {
         test1 = new HystrixTest("Asynchronous-Hystrix");
         Future<String> future = test1.queue();
         LOGGER.info(future.get(100, TimeUnit.MILLISECONDS));
+    }
+
+    class HystrixObservableTest extends HystrixObservableCommand {
+
+        public HystrixObservableTest(String groupName) {
+            super(HystrixCommandGroupKey.Factory.asKey(groupName));
+        }
+
+        @Override
+        protected Observable construct() {
+            return null;
+        }
     }
 
 }
