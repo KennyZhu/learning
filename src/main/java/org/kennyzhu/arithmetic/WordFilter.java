@@ -1,11 +1,10 @@
 package org.kennyzhu.arithmetic;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
 
 
@@ -17,66 +16,42 @@ public class WordFilter {
     private static final FilterSet set = new FilterSet(); // 存储首字
     private static final Map<Integer, WordNode> nodes = new HashMap<Integer, WordNode>(1024, 1); // 存储节点
     private static final Set<Integer> stopwdSet = new HashSet<>(); // 停顿词
-    private static final char SIGN = '*'; // 敏感词过滤替换
 
     static {
         try {
             init();
         } catch (Exception e) {
-            LOGGER.error("###", e);
-            // 加载失败
+            LOGGER.error("###SensitiveWordFilter init error.Cause：" + e.getMessage(), e);
         }
     }
 
     private static void init() {
         // 获取敏感词
-        addSensitiveWord(readWordFromFile("sensitiveWords.txt"));
-        addStopWord(readWordFromFile("sensitiveWordsSplitCode.txt"));
-    }
-
-    /**
-     * 增加敏感词
-     *
-     * @param path
-     * @return
-     */
-    private static List<String> readWordFromFile(String path) {
-        List<String> words;
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(WordFilter.class.getClassLoader().getResourceAsStream(path)));
-            words = new ArrayList<String>(1200);
-            for (String buf = ""; (buf = br.readLine()) != null; ) {
-                if (buf == null || buf.equals(""))
-                    continue;
-                words.add(buf);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-            try {
-                if (br != null)
-                    br.close();
-            } catch (IOException e) {
-            }
-        }
-        return words;
+        addStopWord("!,.,,,#,$,%,&,*,(,),|,?,/,@,\",',;,[,],{,},+,~,-,_,=,^,<,>,！,。,，,￥,（,）,？,、,“,‘,；,【,】,——,……,《, ,》");
     }
 
     /**
      * 增加停顿词
      *
-     * @param words
+     * @param stopWords
      */
-    private static void addStopWord(final List<String> words) {
-        if (!isEmpty(words)) {
-            char[] chs;
-            for (String curr : words) {
-                chs = curr.toCharArray();
-                for (char c : chs) {
-                    stopwdSet.add(charConvert(c));
+    private static void addStopWord(String stopWords) {
+        try {
+            if (StringUtils.isBlank(stopWords)) {
+                return;
+            }
+            List<String> words = Arrays.asList(stopWords.split(","));
+            if (!isEmpty(words)) {
+                char[] chs;
+                for (String curr : words) {
+                    chs = curr.toCharArray();
+                    for (char c : chs) {
+                        stopwdSet.add(charConvert(c));
+                    }
                 }
             }
+        } catch (Exception e) {
+            LOGGER.error("#Add stop word error.Cause:" + e.getMessage(), e);
         }
     }
 
@@ -167,15 +142,36 @@ public class WordFilter {
     }
 
     /**
-     * 过滤判断 将敏感词转化为成屏蔽词
-     *
-     * @param src
+     * @param txt
+     * @param sensitiveWord
+     * @param target
      * @return
      */
-    public static final String doFilter(final String src) {
-        StringBuffer target = new StringBuffer();
+    public static String replace(String txt, String sensitiveWord, String target) {
+
+        Set<String> toReplaceSet = getSensitiveWord(txt, sensitiveWord);
+        if (CollectionUtils.isNotEmpty(toReplaceSet)) {
+            for (String toReplaceStr : toReplaceSet) {
+                txt = txt.replaceAll(toReplaceStr, target);
+            }
+        }
+        return txt;
+    }
+
+    /**
+     * 过滤判断 将敏感词转化为成屏蔽词
+     *
+     * @param txt
+     * @return
+     */
+    public static final Set<String> getSensitiveWord(final String txt, String sourceSensitiveWord) {
+        if (StringUtils.isBlank(txt) || StringUtils.isBlank(sourceSensitiveWord)) {
+            return null;
+        }
+        addSensitiveWord(Arrays.asList(new String[]{sourceSensitiveWord}));//添加敏感词
+        Set<String> result = new HashSet<>();
         if (set != null && nodes != null) {
-            char[] chs = src.toCharArray();
+            char[] chs = txt.toCharArray();
             int length = chs.length;
             int currc; // 当前检查的字符
             int cpcurrc; // 当前检查字符的备份
@@ -191,12 +187,10 @@ public class WordFilter {
                     continue;
                 boolean couldMark = false;
                 int markNum = -1;
-                if (node.isLast()) {// 单字匹配（日）
+                if (node.isLast()) {// 单字匹配
                     couldMark = true;
                     markNum = 0;
                 }
-                // 继续匹配（日你/日你妹），以长的优先
-                // 你-3 妹-4 夫-5
                 k = i;
                 cpcurrc = currc; // 当前字符的拷贝
                 for (; ++k < length; ) {//后面的字符
@@ -215,18 +209,18 @@ public class WordFilter {
                     cpcurrc = temp;
                 }
                 if (couldMark) {
+                    StringBuffer target = new StringBuffer();
                     for (k = 0; k <= markNum; k++) {
                         target.append(chs[k + i]);
-                        chs[k + i] = SIGN;
                     }
+                    result.add(target.toString());
                     i = i + markNum;
                 }
             }
-            LOGGER.info("#Target is " + target.toString());
-            return new String(chs);
+            LOGGER.info("#Txt is " + txt + " SenstiveWord is " + sourceSensitiveWord + " Target is " + result.toString());
         }
 
-        return src;
+        return result;
     }
 
     /**
@@ -255,8 +249,6 @@ public class WordFilter {
                 if (node.isLast()) {// 单字匹配（日）
                     couldMark = true;
                 }
-                // 继续匹配（日你/日你妹），以长的优先
-                // 你-3 妹-4 夫-5
                 k = i;
                 cpcurrc = currc;
                 for (; ++k < length; ) {
@@ -306,10 +298,23 @@ public class WordFilter {
         return false;
     }
 
-    public static final void main(String[] args) {
-        long beginTime = System.currentTimeMillis();
-        System.out.println(WordFilter.doFilter("张《李<鹏》"));
-        System.out.println(" Cost:" + (System.currentTimeMillis() - beginTime) + "   " + (65535 >>> 6));
+    public static void main(String[] args) {
 
+        String source = "你好么hao+评有红包你好么";
+        String sensitiveWord = "欢迎下单";
+        System.out.println(WordFilter.replace(source, source, sensitiveWord));
+//        System.out.println("三椒*蹄".replaceAll("三椒\\*蹄", "三椒美容蹄"));
+//        System.out.println("三椒*蹄".contains("*"));
+//        if (source.contains("*")) {
+//            System.out.println(source.replaceAll("\\*", "美味"));
+//        }
+
+//        if (StringUtils.isNotBlank(source) && source.contains("*") && sensitiveWord.contains("*")) {
+//            System.out.println("1:" + source.replaceAll("\\*", "美味"));
+//            System.out.println("2:" + sensitiveWord.replaceAll("\\*", "\\\\*"));
+//        } else {
+//        System.out.println(source.replaceAll(source, sensitiveWord));
+//        }
     }
+
 }
