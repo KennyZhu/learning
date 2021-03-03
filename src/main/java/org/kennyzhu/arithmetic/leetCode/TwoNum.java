@@ -9,14 +9,12 @@ import java.util.Map;
 public class TwoNum {
     public static int[] twoNum(int[] input, int target) {
         double half = target / 2;
-        int j = input.length - 1;
         Map<Integer, Integer> map = new HashMap<>();
         for (int i = 0; i < input.length; i++) {
             int left = input[i];
-            //int right = input[j];
-            int sub;
+            int sub;//差值计算
             if (left < half) {
-                sub = target - left;
+                sub = target - left;//存大的一半
             } else {
                 sub = left;
             }
