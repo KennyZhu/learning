@@ -1,8 +1,12 @@
 package org.kennyzhu.arithmetic.leetCode;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
+ * 整数翻转
  * Created by yanlongzhu on 2016/11/23.
  */
+@Slf4j
 public class ReverseInteger {
 
     /**
@@ -12,7 +16,7 @@ public class ReverseInteger {
     public static int reverse2(int x) {
         int result = 0;
         while (x != 0) {
-            int tail = x % 10;
+            int tail = x % 10;//取余
             int newResult = result * 10 + tail;
             if ((newResult - tail) / 10 != result) {
                 return 0;
@@ -70,10 +74,25 @@ public class ReverseInteger {
         return result;
     }
 
+    public static int reverse3(int input) {
+        if (input == 0) {
+            return 0;
+        }
+        int result = 0;
+        while (input != 0) {
+            //每循环一次，result*10
+            int tail = input % 10;
+            result = result * 10 + tail;
+            input = input / 10;
+        }
+        return result;
+
+    }
+
     public static void main(String[] args) {
         long begin = System.currentTimeMillis();
-        int result = ReverseInteger.reverse2(Integer.MAX_VALUE);
-        System.out.println(result + "   " + (System.currentTimeMillis() - begin));
+        int result = ReverseInteger.reverse3(120);
+        System.out.println(result);
     }
 }
 
