@@ -1,9 +1,9 @@
 package org.kennyzhu.arithmetic.leetCode;
 
-import lombok.Data;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import lombok.Data;
 
 /**
  * LRU Cache (Least Recently Used Cache)
@@ -38,6 +38,37 @@ public class LRUCache {
             this.value = value;
         }
 
+        public String getKey() {
+            return key;
+        }
+
+        public void setKey(String key) {
+            this.key = key;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public Node getPre() {
+            return pre;
+        }
+
+        public void setPre(Node pre) {
+            this.pre = pre;
+        }
+
+        public Node getNext() {
+            return next;
+        }
+
+        public void setNext(Node next) {
+            this.next = next;
+        }
     }
 
 
