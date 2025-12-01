@@ -7,6 +7,12 @@ GitHub Dependabot 检测到项目存在 **19 个安全漏洞**：
 - 🟡 5 个中等漏洞 (Moderate)
 - 🟢 1 个低危漏洞 (Low)
 
+## 最新更新 (2025-12-01 15:56)
+针对 Dependabot 新发现的 3 个中等漏洞进行了额外修复：
+- ✅ Apache Kafka Clients 权限提升漏洞
+- ✅ Apache Kafka Clients 文件读取和 SSRF 漏洞  
+- ✅ Apache Commons Lang3 无限递归漏洞
+
 ## 已修复的依赖
 
 ### 🔴 严重漏洞修复
