@@ -6,17 +6,50 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
+ * 基于DFA（确定有限状态自动机）的敏感词过滤器
+ * 
+ * 算法原理：
+ * 1. 构建敏感词树（Trie树）
+ * 2. 使用DFA进行快速匹配
+ * 3. 支持停顿词（标点符号）的忽略
+ * 
+ * 核心数据结构：
+ * - FilterSet: 位图存储敏感词首字符，快速判断
+ * - WordNode: 树节点，存储敏感词的字符序列
+ * - stopwdSet: 停顿词集合，匹配时跳过
+ * 
+ * 时间复杂度：
+ * - 构建树：O(n*m)，n为敏感词数量，m为平均长度
+ * - 匹配：O(L)，L为文本长度
+ * 
+ * 优势：
+ * - 匹配速度快：一次遍历即可找出所有敏感词
+ * - 支持中文：全角半角自动转换
+ * - 智能匹配：忽略停顿词，如"日&本"也能匹配"日本"
  */
 public class WordFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WordFilter.class);
-    private static final FilterSet set = new FilterSet(); // 存储首字
-    private static final Map<Integer, WordNode> nodes = new HashMap<Integer, WordNode>(1024, 1); // 存储节点
-    private static final Set<Integer> stopwdSet = new HashSet<>(); // 停顿词
+    
+    // 位图存储敏感词的首字符，用于快速判断是否可能是敏感词
+    private static final FilterSet set = new FilterSet();
+    
+    // 存储敏感词树的根节点映射，key为首字符，value为对应的节点
+    // 使用 ConcurrentHashMap 保证线程安全
+    private static final Map<Integer, WordNode> nodes = new ConcurrentHashMap<>(1024);
+    
+    // 停顿词集合（标点符号等），匹配时会被忽略
+    // 使用 Collections.synchronizedSet 保证线程安全
+    private static final Set<Integer> stopwdSet = Collections.synchronizedSet(new HashSet<>());
 
+    /**
+     * 静态初始化块
+     * 在类加载时执行，初始化停顿词
+     */
     static {
         try {
             init();
@@ -25,9 +58,14 @@ public class WordFilter {
         }
     }
 
+    /**
+     * 初始化方法
+     * 添加默认的停顿词（标点符号）
+     */
     private static void init() {
-        // 获取敏感词
-        addStopWord("!,.,,,#,$,%,&,*,(,),|,?,/,@,\",',;,[,],{,},+,~,-,_,=,^,<,>,！,。,，,￥,（,）,？,、,“,‘,；,【,】,——,……,《, ,》");
+        // 添加中英文标点符号作为停顿词
+        // 这些字符在匹配时会被忽略，如"日*本"可以匹配"日本"
+        addStopWord("!,.,,,#,$,%,&,*,(,),|,?,/,@,\",',;,[,],{,},+,~,-,_,=,^,<,>,！,。,，,￥,（,）,？,、,\",',；,【,】,——,……,《, ,》");
     }
 
     /**
